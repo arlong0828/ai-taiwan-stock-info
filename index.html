@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI 台股每日情報包｜每天 3 分鐘，看懂台股重點</title>
+  <meta name="description" content="盤前抓題材、盤後看結果、新聞不漏看、強勢股不錯過。專為短線與波段投資人設計的 AI 市場整理服務。" />
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(10, 18, 33, 0.82);
+      --panel-2: rgba(15, 24, 43, 0.92);
+      --text: #e8eefc;
+      --muted: #a9b8d6;
+      --brand: #7c9cff;
+      --brand-2: #6ee7b7;
+      --warn: #fbbf24;
+      --line: rgba(148, 163, 184, 0.18);
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124, 156, 255, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(110, 231, 183, 0.14), transparent 28%),
+        linear-gradient(180deg, #06101d 0%, #091424 42%, #040913 100%);
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .nav {
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: blur(14px);
+      background: rgba(5, 10, 18, 0.7);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0;
+      gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: .02em; }
+    .logo {
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow: 0 10px 30px rgba(124, 156, 255, 0.35);
+      display: grid; place-items: center; color: #07111f; font-weight: 900;
+    }
+    .nav-links { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+    .nav-links a:hover { color: var(--text); }
+
+    .hero { padding: 76px 0 36px; }
+    .hero-grid {
+      display: grid; grid-template-columns: 1.15fr .85fr; gap: 28px; align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: #dce7ff; background: rgba(124, 156, 255, 0.12);
+      border: 1px solid rgba(124, 156, 255, 0.24);
+      padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    }
+    h1 {
+      margin: 18px 0 16px; font-size: clamp(40px, 5vw, 72px);
+      line-height: 1.02; letter-spacing: -.04em;
+    }
+    .lead { font-size: clamp(18px, 2.1vw, 22px); line-height: 1.7; color: var(--muted); max-width: 58ch; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 14px 20px; border-radius: 14px; font-weight: 700;
+      border: 1px solid transparent; transition: .18s ease; min-height: 48px;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--brand), #9d7cff); color: white; box-shadow: 0 18px 42px rgba(124, 156, 255, 0.24); }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-secondary { background: rgba(255,255,255,0.03); border-color: var(--line); color: var(--text); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.06); }
+
+    .hero-card, .card {
+      background: linear-gradient(180deg, rgba(17, 25, 45, 0.95), rgba(8, 14, 27, 0.95));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-card { padding: 22px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .metric {
+      padding: 18px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    }
+    .metric strong { display: block; font-size: 24px; margin-bottom: 6px; }
+    .metric span { color: var(--muted); font-size: 14px; }
+    .sample {
+      margin-top: 14px; padding: 18px; border-radius: 18px;
+      background: linear-gradient(180deg, rgba(124, 156, 255, 0.09), rgba(110, 231, 183, 0.06));
+      border: 1px solid rgba(124, 156, 255, 0.16);
+    }
+    .sample h3 { margin: 0 0 10px; font-size: 16px; }
+    .sample ul { margin: 0; padding-left: 18px; color: var(--muted); line-height: 1.8; }
+
+    section { padding: 28px 0; }
+    .section-title { font-size: 32px; margin: 0 0 10px; letter-spacing: -.03em; }
+    .section-desc { color: var(--muted); line-height: 1.7; margin: 0 0 20px; max-width: 70ch; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .card { padding: 22px; }
+    .card h3 { margin: 8px 0 10px; font-size: 20px; }
+    .card p, .card li { color: var(--muted); line-height: 1.75; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;
+      padding: 6px 10px; border-radius: 999px; background: rgba(110, 231, 183, 0.12); color: #baf3dd;
+      border: 1px solid rgba(110, 231, 183, 0.18);
+    }
+    .pricing { align-items: stretch; }
+    .price-card { position: relative; overflow: hidden; }
+    .price-card.featured::before {
+      content: "最推薦"; position: absolute; top: 18px; right: -40px; transform: rotate(35deg);
+      background: linear-gradient(135deg, #fbbf24, #fb7185); color: #081120; font-weight: 800;
+      padding: 8px 48px; font-size: 12px;
+    }
+    .price { font-size: 40px; font-weight: 900; letter-spacing: -.04em; margin: 6px 0; }
+    .price small { font-size: 15px; font-weight: 700; color: var(--muted); }
+    .list { margin: 14px 0 0; padding: 0; list-style: none; }
+    .list li { padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 10px; }
+    .list li::before { content: "✓"; color: var(--brand-2); font-weight: 900; }
+    .timeline { display: grid; gap: 14px; }
+    .step { display: grid; grid-template-columns: 54px 1fr; gap: 16px; align-items: start; }
+    .step-num {
+      width: 54px; height: 54px; border-radius: 18px; display: grid; place-items: center;
+      background: rgba(124, 156, 255, 0.12); border: 1px solid rgba(124, 156, 255, 0.22); font-weight: 900;
+    }
+    .faq { display: grid; gap: 12px; }
+    details {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px;
+    }
+    summary { cursor: pointer; font-weight: 700; }
+    details p { color: var(--muted); line-height: 1.75; margin: 12px 0 0; }
+    .cta {
+      padding: 28px; border-radius: 28px; border: 1px solid rgba(124, 156, 255, 0.2);
+      background: linear-gradient(135deg, rgba(124, 156, 255, 0.16), rgba(110, 231, 183, 0.10));
+      box-shadow: var(--shadow);
+    }
+    .footer { padding: 22px 0 40px; color: var(--muted); font-size: 14px; }
+    .muted { color: var(--muted); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    @media (max-width: 900px) {
+      .hero-grid, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .nav-inner { flex-direction: column; align-items: flex-start; }
+      .hero { padding-top: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><div class="logo">AI</div> 台股每日情報包</div>
+      <nav class="nav-links">
+        <a href="#features">特色</a>
+        <a href="#how">怎麼運作</a>
+        <a href="#pricing">方案</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">📈 每天 3 分鐘，看懂台股重點</div>
+          <h1>盤前抓題材、盤後看結果，<br/>強勢股與新聞不再漏看。</h1>
+          <p class="lead">
+            這是一套專為短線與波段投資人設計的 AI 市場整理服務。
+            我們把雜亂的資訊濃縮成每天真正有用的重點，讓你不用花幾小時盯盤，也能快速掌握市場節奏。
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#pricing">立即查看方案</a>
+            <a class="btn btn-secondary" href="#features">先看內容</a>
+          </div>
+          <p class="muted" style="margin-top:16px">適合：短線交易、波段操作、上班族投資者、想省時間的人。</p>
+        </div>
+
+        <aside class="hero-card">
+          <div class="metric-grid">
+            <div class="metric"><strong>3 分鐘</strong><span>快速掃完市場重點</span></div>
+            <div class="metric"><strong>每日</strong><span>早盤 / 收盤固定更新</span></div>
+            <div class="metric"><strong>完整</strong><span>新聞、題材、強勢股</span></div>
+            <div class="metric"><strong>可訂閱</strong><span>支援個人化追蹤</span></div>
+          </div>
+          <div class="sample">
+            <h3>你會收到什麼？</h3>
+            <ul>
+              <li>盤前關注題材與觀察股</li>
+              <li>收盤回顧與隔日名單</li>
+              <li>新聞摘要與重要公告</li>
+              <li>漏網強勢股與錯過原因</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <h2 class="section-title">你不是缺資訊，你是缺整理。</h2>
+        <p class="section-desc">
+          每天市場訊息太多，真正有價值的是「已經整理過、可快速決策」的內容。
+          這份情報包就是把市場訊號整理成可以直接看的版本。
+        </p>
+        <div class="grid-3">
+          <article class="card">
+            <span class="badge">盤前版</span>
+            <h3>先知道今天該看什麼</h3>
+            <p>整理題材熱度、可能發動族群、盤前值得注意的標的，幫你在開盤前完成基本功課。</p>
+          </article>
+          <article class="card">
+            <span class="badge">收盤版</span>
+            <h3>看懂今天市場真正動了什麼</h3>
+            <p>盤後回顧強勢股、漲停、爆量、族群延續性，並對比前一天觀察股實際表現。</p>
+          </article>
+          <article class="card">
+            <span class="badge">新聞版</span>
+            <h3>只看重要訊息，不被雜訊淹沒</h3>
+            <p>把重大財經新聞、公司公告、法說會與政策重點整理好，讓你知道什麼真的會影響市場。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="container grid-2">
+        <div class="card">
+          <h2 class="section-title">怎麼運作？</h2>
+          <p class="section-desc">流程固定、內容穩定、每天都能持續輸出，讓你養成快速看盤習慣。</p>
+          <div class="timeline">
+            <div class="step"><div class="step-num">1</div><div><h3>資料蒐集</h3><p>抓取市場新聞、盤面資訊、熱門題材與相關公開資料。</p></div></div>
+            <div class="step"><div class="step-num">2</div><div><h3>AI 整理</h3><p>把大量資訊濃縮成重點、風險提示與可追蹤名單。</p></div></div>
+            <div class="step"><div class="step-num">3</div><div><h3>每日推送</h3><p>透過 Telegram / Email / 網頁形式送出，打開就能看。</p></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="section-title">這對誰最有用？</h2>
+          <ul class="list">
+            <li>每天想快速看台股重點的人</li>
+            <li>沒時間自己整理盤前與盤後資訊的人</li>
+            <li>短線、波段、題材型交易者</li>
+            <li>想建立觀察名單與交易習慣的人</li>
+            <li>希望少看雜訊、多看結論的人</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="container">
+        <h2 class="section-title">方案與價格</h2>
+        <p class="section-desc">先用低門檻帶入，再用進階功能提高價值感。這個價格結構適合從小量試用開始。</p>
+        <div class="grid-3 pricing">
+          <article class="card price-card">
+            <span class="badge">Free</span>
+            <h3>免費版</h3>
+            <div class="price">NT$0 <small>/ 月</small></div>
+            <p>先讓使用者每天看見你的價值。</p>
+            <ul class="list">
+              <li>每日簡版重點</li>
+              <li>1 份盤前摘要</li>
+              <li>1 份收盤摘要</li>
+            </ul>
+          </article>
+          <article class="card price-card featured">
+            <span class="badge">Best value</span>
+            <h3>進階版</h3>
+            <div class="price">NT$299 <small>/ 月</small></div>
+            <p>最適合主力銷售與大多數重度使用者。</p>
+            <ul class="list">
+              <li>每日完整版情報</li>
+              <li>新聞摘要與強勢股整理</li>
+              <li>漏網強勢股補充</li>
+              <li>前後績效回顧</li>
+            </ul>
+          </article>
+          <article class="card price-card">
+            <span class="badge">Pro</span>
+            <h3>客製版</h3>
+            <div class="price">NT$999+ <small>/ 月</small></div>
+            <p>個人化追蹤與特定提醒，適合高需求客戶。</p>
+            <ul class="list">
+              <li>個人觀察名單</li>
+              <li>特定族群追蹤</li>
+              <li>指定提醒推送</li>
+              <li>專屬市場摘要</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container grid-2">
+        <div class="card">
+          <h2 class="section-title">FAQ</h2>
+          <div class="faq">
+            <details>
+              <summary>這是投資建議嗎？</summary>
+              <p>不是。本服務提供的是資訊整理與市場觀察，幫助你更快理解盤勢，仍需自行判斷風險。</p>
+            </details>
+            <details>
+              <summary>我每天會收到什麼？</summary>
+              <p>你會收到固定格式的盤前、收盤與新聞摘要，也可升級為個人化追蹤版本。</p>
+            </details>
+            <details>
+              <summary>為什麼有人會付費？</summary>
+              <p>因為這份服務節省的是時間、注意力與整理成本，對需要每天看盤的人非常有價值。</p>
+            </details>
+          </div>
+        </div>
+        <div class="cta">
+          <h2 class="section-title">現在就開始</h2>
+          <p class="section-desc" style="margin-bottom: 18px;">
+            如果你想每天只花幾分鐘，就快速掌握台股重點，這份情報包就是為你做的。
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#pricing">查看訂閱方案</a>
+            <a class="btn btn-secondary" href="mailto:hello@example.com">聯絡我們</a>
+          </div>
+          <p class="muted" style="margin-top: 14px;">* 可替換成 Telegram、LINE OA、Google Form、或你的訂閱頁網址。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container footer">
+        <div class="card" style="padding:18px 20px;">
+          <strong>免責聲明</strong>
+          <p class="muted" style="margin:10px 0 0; line-height:1.7;">
+            本服務提供的是資訊整理與市場觀察，不保證獲利，也不構成投資建議。投資有風險，請自行判斷與承擔。
+          </p>
+        </div>
+        <p style="margin-top: 16px;">© 2026 AI 台股每日情報包</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
